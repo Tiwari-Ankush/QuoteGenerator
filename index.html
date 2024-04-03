@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Quote of the day</title>
+</head>
+<body>
+    <div class="quote-box">
+        <h2>Quote of the day</h2>
+        <blockquote id="quote">Loading...</blockquote>
+        <span id="author">Loading...</span>
+        <div>
+            <button id="new-quote">New Quote</button>
+            <button id="tweet-button"><img src="./twitter.png" alt=""> Tweet</button>
+            <button id="linkedin-button"><img src="./linkedin.png" alt=""> Post</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const quoteElement = document.getElementById('quote');
+            const authorElement = document.getElementById('author');
+            const newQuoteButton = document.getElementById('new-quote');
+            const tweetButton = document.getElementById('tweet-button');
+            const linkedinButton = document.getElementById('linkedin-button');
+
+            async function fetchQuote() {
+                const url = 'https://type.fit/api/quotes';
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    const randomIndex = Math.floor(Math.random() * data.length);
+                    const quote = data[randomIndex].text;
+                    const author = data[randomIndex].author || 'Unknown';
+                    quoteElement.textContent = `"${quote}"`;
+                    authorElement.textContent = `- ${author}`;
+                } catch (error) {
+                    console.error('Error fetching quote:', error);
+                    quoteElement.textContent = 'Failed to fetch quote';
+                    authorElement.textContent = '';
+                }
+            }
+
+            newQuoteButton.addEventListener('click', fetchQuote);
+
+            tweetButton.addEventListener('click', () => {
+                const quote = encodeURIComponent(document.getElementById('quote').textContent.trim());
+                const author = encodeURIComponent(document.getElementById('author').textContent.trim());
+                const tweetUrl = `https://twitter.com/intent/tweet?text=${quote} ${author}`;
+                window.open(tweetUrl, '_blank');
+            });
+
+            linkedinButton.addEventListener('click', () => {
+                const quote = encodeURIComponent(document.getElementById('quote').textContent.trim());
+                const author = encodeURIComponent(document.getElementById('author').textContent.trim());
+                const pageUrl = encodeURIComponent(window.location.href);
+                const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}&title=${quote} ${author}`;
+                window.open(linkedinUrl, '_blank');
+            });
+
+            // Fetch initial quote
+            fetchQuote();
+        });
+    </script>
+</body>
+</html>
